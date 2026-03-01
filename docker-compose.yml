@@ -1,23 +1,63 @@
+version: '3.8'
+
 services:
-  scraper:
+  # PostgrSQL Datenbank
+  db:
+    image: postgres:15-alpine
+    container_name: f1_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-f1_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-f1_pass}
+      POSTGRES_DB: ${DB_NAME:-f1_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Live-Streaming (Dauerhaft laufend während der Sessions)
+  f1_live_ingestor:
+    build:
+      context: .
+      dockerfile: projects/f1_live_tracker/Dockerfile
+    container_name: f1_live_tracker
+    restart: on-failure
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./projects/f1_live_tracker:/app
+
+  # Historische F1-Daten
+  f1_history_etl:
+    build:
+      context: .
+      dockerfile: projects/f1_history/Dockerfile
+    container_name: f1_history_loader
+    restart: "no"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+    volumes:
+      - ./projects/f1_history:/app
+
+  # FUTWIZ Scraper
+  fifa_scraper:
     build:
       context: .
       dockerfile: projects/fut_market_scraper/Dockerfile
-    container_name: fifa_scraper
-    volumes:
-      - .:/app
+    container_name: fifa_market_scraper
+    restart: "no"
+    depends_on:
+      - db
     environment:
-      - PYTHONUNBUFFERED=1
-      - PYTHONPATH=/app
-    restart: no
-  f1_data:
-    build:
-      context: .
-      dockerfile: projects/f1_data_loader/Dockerfile
-    container_name: f1_data_loader
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
     volumes:
-      - .:/app
-    environment:
-      - PYTHONUNBUFFERED=1
-      - PYTHONPATH=/app
-    restart: no
+      - ./projects/fut_market_scraper:/app
+
+volumes:
+  postgres_data:
+    driver: local

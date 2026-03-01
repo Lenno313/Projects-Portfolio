@@ -10,6 +10,7 @@ def main():
     with get_db_session() as session:
         ingestor = F1Ingestor(session)
 
+        # Beispiel - Daten von 2025 laden
         ingestor.ingest_2025_results()
 
         # TODO Einzelne Telemetrien von Rennen / Qualifyings laden
