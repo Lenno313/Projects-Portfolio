@@ -15,17 +15,24 @@ Ziel dieses Repositories ist es, bisherige Projekte von mir zu modularisieren un
 Dieses Projekt ist zweigeteilt: **1a** befasst sich mit der hochfrequenten Echtzeit-Telemetrie via SignalR, während **1b** ein klassisches Data Warehouse für historische Rennergebnisse aufbaut.
 
 <details>
-<summary>Details anzeigen</summary>
+<summary>Details zu F1-Telemetrie Projekt anzeigen</summary>
 
-#### Projekt 1a: Live-Telemetrie (Streaming)
+#### Beschreibung: Live-Telemetrie (Streaming)
 - **Architektur:** Event-driven Ingestor mit asynchronen Callbacks.
 - **Features:** In-Memory-Buffering für Bulk-Inserts, Backup-Load-Logik bei Verbindungsabbruch.
 - **Tech-Stack:** FastF1 (Livetiming Client), SignalR, NumPy (Resampling).
+</details>
 
-#### Projekt 1b: Race History (Batch / Warehouse)
+
+<details>
+<summary>Details zu F1-Historie Projekt anzeigen</summary>
+
+#### Beschreibung: Race History (Batch / Warehouse)
 - **Architektur:** Klassische ETL-Pipeline zur Historisierung von Saisondaten.
 - **Datenmodell:** Implementierung eines Star-Schemas in SQL.
 - **Tech-Stack:** Pandas, SQLAlchemy.
+
+
 </details>
 
 ---
@@ -112,7 +119,7 @@ Die Steuerung erfolgt über eine zentrale `docker-compose.yml` auf einem Raspber
     - [x] FUT-Scraper
     - [ ] Garmin-Daten
 - [ ] Initialer Aufbau der Datenbank-Schemata (SQLAlchemy).
-    - [ ] F1 Star-Schema (Fact/Dimension Tables)
+    - [ ] Formel1-Telemetrie Schema
     - [x] Formel1-Historie (Star-Schema)
     - [x] FUT-Spielerpreise Schema
     - [ ] Garmin-Daten Schema
