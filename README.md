@@ -90,7 +90,8 @@ Die Steuerung erfolgt über eine zentrale `docker-compose.yml` auf einem Raspber
     - [x] FUT-Spielerpreise Schema
     - [ ] Garmin-Daten Schema
 - [x] Erstellen & Testen von docker-compose & Dockerfiles
-- [ ] Neuaufsetzen des Raspberry Pi OS (Lite) und Konfiguration der Docker-Engine sowie Docker Compose.
+- [x] Neuaufsetzen des Raspberry Pi OS (Lite) und Konfiguration der Docker-Engine sowie Docker Compose.
+- [ ] Einrichten der persistenten PostgreSQL-Instanz als Docker-Container auf externer Festplatte
 
 #### Phase 2 
 - [ ] Database Layer: Deployment des PostgreSQL-Containers
