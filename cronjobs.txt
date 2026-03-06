@@ -1,0 +1,7 @@
+# Befehl zum Setzen: /home/lennart/Desktop/cronjobs.txt
+# Auslesen: crontab -l
+
+# Min Std Tag Monat Wochentag
+
+# FUT Scraper alle 15min
+*/15 * * * * cd /home/lennart/Desktop/Data-Engineer-Projects/projects/fut_market_scraper && /usr/bin/docker compose run --rm fifa_scraper > /home/lennart/scraper.log 2>&1

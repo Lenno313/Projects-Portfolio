@@ -22,14 +22,14 @@ class FifaPriceIngestor:
             logger.info(f"Neuer Spieler angelegt: {f_name} {l_name} [{f_id}]")
         return player
 
-    def save_price_to_db(self, f_id, price_val):
+    def save_price_to_db(self, f_id, price_val, start_time):
         """Speichert einen neuen Preiseintrag für einen Spieler."""
-        new_price = Price(player_id=f_id, price_value=price_val)
+        new_price = Price(player_id=f_id, price_value=price_val, timestamp=start_time)
         self.session.add(new_price)
         self.session.commit() # Session Zwischenspeichern
 
     # SCRAPING -> EINZELSPIELER
-    def fetch_by_player(self, f_id, f_name, l_name):
+    def fetch_by_player(self, f_id, f_name, l_name, start_time):
         """Sicherer Ingest mit Playwright."""
         self.save_player_to_db(f_id, f_name, l_name)
         
@@ -40,8 +40,9 @@ class FifaPriceIngestor:
             price = self._scrape_price_with_playwright(url=url)
         except Exception as e:
             logger.error(f"Fehler bei {f_name}: {e}")
+            return
 
-        self.save_price_to_db(f_id, price)
+        self.save_price_to_db(f_id, price, start_time)
         logger.success(f"Preis für {player_slug} [{price}] wurde gespeichert.")
     
         """
@@ -51,7 +52,7 @@ class FifaPriceIngestor:
         price_div = soup.find("div", class_="text-cyan-300")
         """
 
-    def _scrape_price_with_playwright(self, url: str) -> int:
+    def _scrape_price_with_playwright(self, url: str) -> int | None:
         """Starte einen virtuellen browser auf der Seite und lese den Preis aus."""
         clean_price = None
         with sync_playwright() as p:
@@ -80,7 +81,6 @@ class FifaPriceIngestor:
                 raw_price = page.inner_text(price_selector)
                 clean_price = int(raw_price.replace(".", "").replace(",", "").replace(" coins", "").strip())
                 
-                logger.info(f"Preis gefunden: {clean_price}")
                 return clean_price
 
             except Exception as e:
@@ -93,7 +93,7 @@ class FifaPriceIngestor:
         return clean_price
     
     # SCRAPING -> RATING
-    def fetch_by_rating(self, rating):
+    def fetch_by_rating(self, rating, start_time):
         """Hol die Preise der 10 günstigsten Spieler mit dem rating."""
         url = f"https://www.futwiz.com/lowest-price-ratings"
         
@@ -106,7 +106,7 @@ class FifaPriceIngestor:
                     rating=rating,
                     price_value=price,
                     rank=index + 1,
-                    timestamp=datetime.utcnow()
+                    timestamp=start_time,
                 )
                 self.session.add(snapshot)
             
@@ -153,9 +153,9 @@ class FifaPriceIngestor:
                     logger.warning(f"Nicht genug Spieler für Rating {target_rating} gefunden (Gefunden: {len(price_elements)})")
                     return []
 
-                for el in price_elements[start_idx:end_idx]:
+                for element in price_elements[start_idx:end_idx]:
                     try:
-                        text = el.inner_text().strip().upper()
+                        text = element.inner_text().strip().upper()
                         
                         if 'K' in text:
                             price = int(float(text.replace("K", "")) * 1000)
@@ -166,7 +166,7 @@ class FifaPriceIngestor:
                             
                         prices.append(price)
                     except ValueError:
-                        logger.error(f"Konnte Preis-Text '{text}' nicht in Zahl umwandeln.")
+                        logger.error(f"Konnte Preis-Text in Element {element} nicht in Zahl umwandeln.")
                         continue
 
             except Exception as e:

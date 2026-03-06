@@ -5,6 +5,7 @@ from loguru import logger
 import os
 import csv
 from collections import namedtuple
+from datetime import datetime
 
 PlayerRecord = namedtuple('PlayerRecord', ['f_name', 'l_name', 'f_id'])
 
@@ -24,7 +25,7 @@ def load_player_watchlist():
 def load_rating_watchlist():
     """Lies die CSV-Datei für die Ratings aus."""
     ratings = []
-    csv_path = os.path.join(os.path.dirname(__file__), "ratings.csv")
+    csv_path = os.path.join(os.path.dirname(__file__), "rating_watchlist.csv")
     try:
         with open(csv_path, mode='r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
@@ -33,11 +34,13 @@ def load_rating_watchlist():
     except Exception as e:
         logger.error(f"Fehler bei ratings.csv: {e}")
         return []
+    return ratings
 
 def main():
     init_db(models.Base)
 
     logger.info("Starte FUT Scraper...")
+    start_time = datetime.now().replace(second=0, microsecond=0)
 
     with get_db_session() as session:
         ingestor = FifaPriceIngestor(session)
@@ -45,11 +48,11 @@ def main():
         watchlist = load_player_watchlist()
 
         for player in watchlist:
-            ingestor.fetch_by_player(f_name=player.f_name, l_name=player.l_name, f_id=player.f_id)
+            ingestor.fetch_by_player(f_name=player.f_name, l_name=player.l_name, f_id=player.f_id, start_time=start_time)
 
         rating_list = load_rating_watchlist()
         for rating in rating_list:
-            ingestor.fetch_by_rating(rating)
+            ingestor.fetch_by_rating(rating, start_time=start_time)
         
         session.commit()
         
