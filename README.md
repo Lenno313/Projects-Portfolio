@@ -125,15 +125,16 @@ Die Steuerung erfolgt über eine zentrale `docker-compose.yml` auf einem Raspber
     - [ ] Garmin-Daten Schema
 - [x] Erstellen & Testen von docker-compose & Dockerfiles
 - [x] Neuaufsetzen des Raspberry Pi OS (Lite) und Konfiguration der Docker-Engine sowie Docker Compose.
-- [ ] Einrichten der persistenten PostgreSQL-Instanz als Docker-Container auf externer Festplatte
+- [x] Einrichten der persistenten PostgreSQL-Instanz als Docker-Container auf externer Festplatte
 
 #### Phase 2 
-- [ ] Database Layer: Deployment des PostgreSQL-Containers
-- [ ] Containerisierung: Erstellung von Docker-Images für jeden Ingestor.
-- [ ] Automation: Implementierung der Cron-Logik (FIFA täglich, F1 rennwochenendspezifisch).
-- [ ] Secret Management: Umstellung aller Hardcoded-Credentials auf Umgebungsvariablen (.env).
+- [x] Database Layer: Deployment des PostgreSQL-Containers
+- [ ] Containerisierung: Erstellung von Docker-Images für 
+    - [x] den FUT-Scraper
+- [x] Automation: Implementierung der Cron-Logik (FIFA täglich, F1 rennwochenendspezifisch).
+- [x] Secret Management: Umstellung aller Hardcoded-Credentials auf Umgebungsvariablen (.env).
 
 #### Phase 3: Weitere Feature-Ideen wie Analytics & Monitoring einbauen
 - [ ] Data Quality Checks: Validierungsskripte zur Erkennung von Ingestions-Fehlern.
-- [ ] Visualisierung: Aufbau eines Streamlit-Dashboards (Preisverläufe FIFA & Sektorenvergleiche F1).
+- [x] Visualisierung: Aufbau eines Streamlit-Dashboards für die Preisverläufe der Spieler
 - [ ] Health Check: Einbindung eines Monitoring-Tools (z.B. Portainer) zur Systemüberwachung.
